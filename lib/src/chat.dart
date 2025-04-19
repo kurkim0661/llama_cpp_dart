@@ -2,7 +2,8 @@
 enum ChatFormat {
   chatml,
   alpaca,
-  gemini;
+  gemini,
+  phi;
 
   String get value => name;
 }
@@ -84,6 +85,8 @@ class ChatHistory {
         return _exportAlpaca();
       case ChatFormat.gemini:
         return _exportGemini(leaveLastAssistantOpen: leaveLastAssistantOpen);
+      case ChatFormat.phi:
+        return _exportPhi();
     }
   }
 
@@ -120,6 +123,27 @@ class ChatHistory {
       buffer.writeln();
     }
 
+    return buffer.toString();
+  }
+
+  ///<|system|>Insert System Message<|end|><|user|>Insert User Message<|end|><|assistant|>
+  String _exportPhi() {
+
+    final buffer = StringBuffer();
+
+    for (final message in messages) {
+      switch (message.role) {
+        case Role.system:
+          buffer.writeln('<|system|>${message.content}<|end|>');
+        case Role.user:
+          buffer.writeln('<|user|>${message.content}<|end|>');
+        case Role.assistant:
+          buffer.writeln('<|assistant|>${message.content}<|end|>');
+        case Role.unknown:
+          break;
+      }
+    }
+    buffer.writeln('<|assistant|>');
     return buffer.toString();
   }
 
